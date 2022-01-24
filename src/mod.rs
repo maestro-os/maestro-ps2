@@ -17,7 +17,6 @@ use kernel::event;
 use kernel::idt;
 use kernel::io;
 use kernel::module::version::Version;
-use kernel::print;
 use kernel::process::Regs;
 
 kernel::module!("ps2", Version::new(1, 0, 0));
@@ -37,8 +36,6 @@ const MAX_ATTEMPTS: usize = 3;
 
 /// Response telling the test passed.
 const TEST_CONTROLLER_PASS: u8 = 0x55;
-/// Response telling the test failed.
-const TEST_CONTROLLER_FAIL: u8 = 0xfc;
 
 /// Response telling the keyboard test passed.
 const TEST_KEYBOARD_PASS: u8 = 0x00;
@@ -51,13 +48,9 @@ const KEYBOARD_SCANCODE: u8 = 0xf0;
 const KEYBOARD_TYPEMATIC: u8 = 0xf3;
 /// Command to enable keyboard scanning.
 const KEYBOARD_ENABLE: u8 = 0xf4;
-/// Command to disable keyboard scaning.
-const KEYBOARD_DISABLE: u8 = 0xf5;
 
 /// Keyboard acknowledgement.
 const KEYBOARD_ACK: u8 = 0xfa;
-/// Response telling to resend the command.
-const KEYBOARD_RESEND: u8 = 0xf4;
 
 // TODO Turn commands and flags into constants.
 
@@ -155,13 +148,13 @@ static NORMAL_KEYS: [(u8, KeyboardKey); 85] = [
 static SPECIAL_KEYS: [(u8, KeyboardKey); 38] = [
 	(0x10, KeyboardKey::KeyPreviousTrack),
 	(0x19, KeyboardKey::KeyNextTrack),
-	(0x1C, KeyboardKey::KeyKeypadEnter),
-	(0x1D, KeyboardKey::KeyRightControl),
+	(0x1c, KeyboardKey::KeyKeypadEnter),
+	(0x1d, KeyboardKey::KeyRightControl),
 	(0x20, KeyboardKey::KeyMute),
 	(0x21, KeyboardKey::KeyCalculator),
 	(0x22, KeyboardKey::KeyPlay),
 	(0x24, KeyboardKey::KeyStop),
-	(0x2E, KeyboardKey::KeyVolumeDown),
+	(0x2e, KeyboardKey::KeyVolumeDown),
 	(0x30, KeyboardKey::KeyVolumeUp),
 	(0x32, KeyboardKey::KeyWWWHome),
 	(0x35, KeyboardKey::KeyKeypadSlash),
@@ -169,28 +162,28 @@ static SPECIAL_KEYS: [(u8, KeyboardKey); 38] = [
 	(0x47, KeyboardKey::KeyHome),
 	(0x48, KeyboardKey::KeyCursorUp),
 	(0x49, KeyboardKey::KeyPageUp),
-	(0x4B, KeyboardKey::KeyCursorLeft),
-	(0x4D, KeyboardKey::KeyCursorRight),
-	(0x4F, KeyboardKey::KeyEnd),
+	(0x4b, KeyboardKey::KeyCursorLeft),
+	(0x4d, KeyboardKey::KeyCursorRight),
+	(0x4f, KeyboardKey::KeyEnd),
 	(0x50, KeyboardKey::KeyCursorDown),
 	(0x51, KeyboardKey::KeyPageDown),
 	(0x52, KeyboardKey::KeyInsert),
 	(0x53, KeyboardKey::KeyDelete),
-	(0x5B, KeyboardKey::KeyLeftGUI),
-	(0x5C, KeyboardKey::KeyRightGUI),
-	(0x5D, KeyboardKey::KeyApps),
-	(0x5E, KeyboardKey::KeyACPIPower),
-	(0x5F, KeyboardKey::KeyACPISleep),
+	(0x5b, KeyboardKey::KeyLeftGUI),
+	(0x5c, KeyboardKey::KeyRightGUI),
+	(0x5d, KeyboardKey::KeyApps),
+	(0x5e, KeyboardKey::KeyACPIPower),
+	(0x5f, KeyboardKey::KeyACPISleep),
 	(0x63, KeyboardKey::KeyACPIWake),
 	(0x65, KeyboardKey::KeyWWWSearch),
 	(0x66, KeyboardKey::KeyWWWFavorites),
 	(0x67, KeyboardKey::KeyWWWRefresh),
 	(0x68, KeyboardKey::KeyWWWStop),
 	(0x69, KeyboardKey::KeyWWWForward),
-	(0x6A, KeyboardKey::KeyWWWBack),
-	(0x6B, KeyboardKey::KeyMyComputer),
-	(0x6C, KeyboardKey::KeyEmail),
-	(0x6D, KeyboardKey::KeyMediaSelect),
+	(0x6a, KeyboardKey::KeyWWWBack),
+	(0x6b, KeyboardKey::KeyMyComputer),
+	(0x6c, KeyboardKey::KeyEmail),
+	(0x6d, KeyboardKey::KeyMediaSelect),
 ];
 
 /// Tells whether the PS/2 buffer is ready for reading.
@@ -393,7 +386,7 @@ fn handle_input(key: KeyboardKey, action: KeyboardAction) {
 	// TODO Do not retrieve at each keystroke
 	if let Some(manager) = manager::get_by_name("kbd") {
 		if let Some(manager) = manager.get_mut() {
-			let mut guard = manager.lock(true);
+			let mut guard = manager.lock();
 			let manager = guard.get_mut();
 
 			let kbd_manager = unsafe {
