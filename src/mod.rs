@@ -17,7 +17,8 @@ use kernel::event;
 use kernel::idt;
 use kernel::io;
 use kernel::module::version::Version;
-use kernel::process::Regs;
+use kernel::println;
+use kernel::process::regs::Regs;
 
 kernel::module!("ps2", Version::new(1, 0, 0));
 
@@ -401,6 +402,9 @@ fn handle_input(key: KeyboardKey, action: KeyboardAction) {
 	}
 }
 
+/// Global variable containing the module's instance.
+static mut PS2_KEYBOAD: Option<PS2Keyboard> = None;
+
 /// The PS2 keyboard structure.
 pub struct PS2Keyboard {
 	/// The callback hook for keyboard input interrupts.
@@ -479,11 +483,22 @@ impl Keyboard for PS2Keyboard {
 
 #[no_mangle]
 pub extern "C" fn init() -> bool {
-	// TODO Add PS/2 keyboard to the keyboard manager
-	true
+	let kbd = PS2Keyboard::new().ok();
+	let success = kbd.is_some();
+	if !success {
+		println!("Failed to initialize PS2 keyboard!");
+	}
+
+	unsafe { // Safe because only one thread can access this function
+		PS2_KEYBOAD = kbd;
+	}
+
+	success
 }
 
 #[no_mangle]
 pub extern "C" fn fini() {
-	// TODO Remove PS/2 keyboard from the keyboard manager
+	unsafe { // Safe because only one thread can access this function
+		PS2_KEYBOAD = None;
+	}
 }
