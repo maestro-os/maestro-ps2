@@ -386,7 +386,7 @@ fn read_keystroke() -> (KeyboardKey, KeyboardAction) {
 fn handle_input(key: KeyboardKey, action: KeyboardAction) {
 	// TODO Do not retrieve at each keystroke
 	if let Some(manager) = manager::get_by_name("kbd") {
-		if let Some(manager) = manager.get_mut() {
+		if let Some(manager) = manager.get() {
 			let guard = manager.lock();
 			let manager = guard.get_mut();
 
