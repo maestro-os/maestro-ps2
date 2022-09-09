@@ -443,22 +443,21 @@ impl PS2Keyboard {
 			set_config_byte(get_config_byte() | 0b1);
 			clear_buffer();
 
-			let callback = | _id: u32, _code: u32, _regs: &Regs, _ring: u32 | {
-				while can_read() {
-					let (key, action) = read_keystroke();
-					handle_input(key, action);
-				}
+			Ok(())
+		})?;
 
-				InterruptResult::new(false, InterruptResultAction::Resume)
-			};
-			let hook_result = event::register_callback(KEYBOARD_INTERRUPT_ID, 0, callback);
-			if let Ok(hook) = hook_result {
-				self.keyboard_interrupt_callback_hook = Some(hook);
-				Ok(())
-			} else {
-				Err(())
+		let callback = | _id: u32, _code: u32, _regs: &Regs, _ring: u32 | {
+			while can_read() {
+				let (key, action) = read_keystroke();
+				handle_input(key, action);
 			}
-		})
+
+			InterruptResult::new(false, InterruptResultAction::Resume)
+		};
+
+		let hook_result = event::register_callback(KEYBOARD_INTERRUPT_ID, 0, callback);
+		self.keyboard_interrupt_callback_hook = hook_result.ok();
+		Ok(())
 	}
 }
 
