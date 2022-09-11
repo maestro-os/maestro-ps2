@@ -441,10 +441,10 @@ impl PS2Keyboard {
 			enable_keyboard()?;
 
 			set_config_byte(get_config_byte() | 0b1);
-			clear_buffer();
 
 			Ok(())
 		})?;
+		clear_buffer();
 
 		let callback = | _id: u32, _code: u32, _regs: &Regs, _ring: u32 | {
 			while can_read() {
