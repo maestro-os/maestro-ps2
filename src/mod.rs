@@ -444,7 +444,6 @@ impl PS2Keyboard {
 
 			Ok(())
 		})?;
-		clear_buffer();
 
 		let callback = | _id: u32, _code: u32, _regs: &Regs, _ring: u32 | {
 			while can_read() {
@@ -457,6 +456,8 @@ impl PS2Keyboard {
 
 		let hook_result = event::register_callback(KEYBOARD_INTERRUPT_ID, 0, callback);
 		self.keyboard_interrupt_callback_hook = hook_result.ok();
+
+		clear_buffer();
 		Ok(())
 	}
 }
