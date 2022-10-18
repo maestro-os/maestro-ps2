@@ -20,7 +20,7 @@ use kernel::module::version::Version;
 use kernel::println;
 use kernel::process::regs::Regs;
 
-kernel::module!("ps2", Version::new(1, 0, 0));
+kernel::module!("ps2", Version::new(1, 0, 0), &[]);
 
 /// The interrupt number for keyboard input events.
 const KEYBOARD_INTERRUPT_ID: usize = 33;
@@ -483,17 +483,21 @@ impl Keyboard for PS2Keyboard {
 
 #[no_mangle]
 pub extern "C" fn init() -> bool {
-	let kbd = PS2Keyboard::new().ok();
-	let success = kbd.is_some();
-	if !success {
-		println!("Failed to initialize PS2 keyboard!");
-	}
+	match PS2Keyboard::new() {
+		Ok(kbd) => {
+			unsafe { // Safe because only one thread can access this function
+				PS2_KEYBOAD = Some(kbd);
+			}
 
-	unsafe { // Safe because only one thread can access this function
-		PS2_KEYBOAD = kbd;
-	}
+			true
+		},
 
-	success
+		Err(()) => {
+			println!("Failed to initialize PS2 keyboard!");
+
+			false
+		},
+	}
 }
 
 #[no_mangle]
