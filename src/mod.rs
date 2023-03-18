@@ -387,11 +387,10 @@ fn handle_input(key: KeyboardKey, action: KeyboardAction) {
 	// TODO Do not retrieve at each keystroke
 	if let Some(manager) = manager::get_by_name("kbd") {
 		if let Some(manager) = manager.get() {
-			let guard = manager.lock();
-			let manager = guard.get_mut();
+			let mut manager = manager.lock();
 
 			let kbd_manager = unsafe {
-				&mut *(manager as *mut dyn DeviceManager as *mut KeyboardManager)
+				&mut *(&mut *manager as *mut dyn DeviceManager as *mut KeyboardManager)
 			};
 			kbd_manager.input(key, action);
 
