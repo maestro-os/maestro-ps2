@@ -16,13 +16,21 @@ fn main() {
     let arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
     let profile = env::var("PROFILE").unwrap();
 
+    // Host libraries (macros, for example)
+    println!(
+        "cargo:rustc-link-search={}/target/{profile}/deps",
+        kern_src.display()
+    );
+
+    // The kernel
     println!(
         "cargo:rustc-link-search={}/target/{arch}/{profile}",
         kern_src.display()
     );
+
+    // The kernel's dependencies (libcore, etc...)
     println!(
         "cargo:rustc-link-search={}/target/{arch}/{profile}/deps",
         kern_src.display()
     );
-    println!("cargo:rustc-env=RUSTFLAGS=-Cprefer-dynamic");
 }
