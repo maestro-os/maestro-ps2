@@ -14,7 +14,3 @@ crate-type = ["dylib"]
 [profile.release]
 lto = true
 panic = "abort"
-rustflags = ["-Cforce-frame-pointers=yes", "-Cno-redzone=yes", "-Cprefer-dynamic"]
-
-[profile.dev]
-rustflags = ["-Cforce-frame-pointers=yes", "-Cno-redzone=yes", "-Cprefer-dynamic"]

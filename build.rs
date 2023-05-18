@@ -33,4 +33,8 @@ fn main() {
         "cargo:rustc-link-search={}/target/{arch}/{profile}/deps",
         kern_src.display()
     );
+
+    println!(
+        "cargo:rustc-env=RUSTFLAGS=-Cforce-frame-pointers=yes -Cno-redzone=yes -Cprefer-dynamic"
+    );
 }
