@@ -11,6 +11,10 @@ name = "ps2"
 path = "src/mod.rs"
 crate-type = ["dylib"]
 
+[build-dependencies]
+#module_build = { git = "https://github.com/llenotre/maestro_module_build.git" }
+module_build = { path = "../maestro_mod_build" }
+
 [profile.release]
 lto = true
 panic = "abort"
