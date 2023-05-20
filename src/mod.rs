@@ -2,6 +2,7 @@
 //! It has now been deprecated in favor of USB keyboards/mouses.
 
 #![no_std]
+#![no_main]
 
 extern crate kernel;
 
