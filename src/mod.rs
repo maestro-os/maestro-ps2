@@ -382,22 +382,25 @@ fn read_keystroke() -> (KeyboardKey, KeyboardAction) {
 }
 
 /// Handles the given keyboard input.
-/// `key` is the key that has been typed.
-/// `action` is the action.
+///
+/// Arguments:
+/// - `key` is the key that has been typed.
+/// - `action` is the action.
 fn handle_input(key: KeyboardKey, action: KeyboardAction) {
 	// TODO Do not retrieve at each keystroke
-	if let Some(manager) = manager::get_by_name("kbd") {
-		if let Some(manager) = manager.get() {
-			let mut manager = manager.lock();
+	let manager = manager::get_by_name("kbd")
+		.map(|manager| manager.upgrade())
+		.flatten();
+	if let Some(manager) = manager {
+		let mut manager = manager.lock();
 
-			let kbd_manager = unsafe {
-				&mut *(&mut *manager as *mut dyn DeviceManager as *mut KeyboardManager)
-			};
-			kbd_manager.input(key, action);
+		let kbd_manager = unsafe {
+			&mut *(&mut *manager as *mut dyn DeviceManager as *mut KeyboardManager)
+		};
+		kbd_manager.input(key, action);
 
-			if key == KeyboardKey::KeyPause && action == KeyboardAction::Pressed {
-				kbd_manager.input(key, KeyboardAction::Released);
-			}
+		if key == KeyboardKey::KeyPause && action == KeyboardAction::Pressed {
+			kbd_manager.input(key, KeyboardAction::Released);
 		}
 	}
 }
