@@ -13,7 +13,8 @@ use kernel::device::keyboard::KeyboardLED;
 use kernel::device::keyboard::KeyboardManager;
 use kernel::device::manager::DeviceManager;
 use kernel::device::manager;
-use kernel::event::{CallbackHook, InterruptResult, InterruptResultAction};
+use kernel::event::CallbackHook;
+use kernel::event::CallbackResult;
 use kernel::event;
 use kernel::idt;
 use kernel::io;
@@ -24,7 +25,7 @@ use kernel::process::regs::Regs;
 kernel::module!("ps2", Version::new(1, 0, 0), &[]);
 
 /// The interrupt number for keyboard input events.
-const KEYBOARD_INTERRUPT_ID: usize = 33;
+const KEYBOARD_INTERRUPT_ID: u32 = 0x21;
 
 /// The PS/2 controller data port.
 const DATA_REGISTER: u16 = 0x60;
@@ -454,10 +455,10 @@ impl PS2Keyboard {
 				handle_input(key, action);
 			}
 
-			InterruptResult::new(false, InterruptResultAction::Resume)
+			CallbackResult::Continue
 		};
 
-		let hook_result = event::register_callback(KEYBOARD_INTERRUPT_ID, 0, callback);
+		let hook_result = event::register_callback(KEYBOARD_INTERRUPT_ID, callback);
 		self.keyboard_interrupt_callback_hook = hook_result.ok();
 
 		clear_buffer();
