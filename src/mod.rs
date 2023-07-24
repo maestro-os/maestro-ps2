@@ -375,10 +375,7 @@ fn read_keystroke() -> (KeyboardKey, KeyboardAction) {
 /// - `action` is the action.
 fn handle_input(key: KeyboardKey, action: KeyboardAction) {
     // TODO Do not retrieve at each keystroke
-    let manager = manager::get::<KeyboardManager>()
-        .map(|manager| manager.upgrade())
-        .flatten();
-    if let Some(manager) = manager {
+    if let Some(manager) = manager::get::<KeyboardManager>() {
         let mut manager = manager.lock();
 
         let kbd_manager =
