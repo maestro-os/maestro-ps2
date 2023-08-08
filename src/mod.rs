@@ -3,16 +3,17 @@
 
 #![no_std]
 #![no_main]
+#![feature(trait_upcasting)]
 
 extern crate kernel;
 
+use core::any::Any;
 use kernel::device::keyboard::Keyboard;
 use kernel::device::keyboard::KeyboardAction;
 use kernel::device::keyboard::KeyboardKey;
 use kernel::device::keyboard::KeyboardLED;
 use kernel::device::keyboard::KeyboardManager;
 use kernel::device::manager;
-use kernel::device::manager::DeviceManager;
 use kernel::event;
 use kernel::event::CallbackHook;
 use kernel::event::CallbackResult;
@@ -375,11 +376,12 @@ fn read_keystroke() -> (KeyboardKey, KeyboardAction) {
 /// - `action` is the action.
 fn handle_input(key: KeyboardKey, action: KeyboardAction) {
     // TODO Do not retrieve at each keystroke
-    if let Some(manager) = manager::get::<KeyboardManager>() {
-        let mut manager = manager.lock();
+    if let Some(manager_mutex) = manager::get::<KeyboardManager>() {
+        let mut manager = manager_mutex.lock();
 
-        let kbd_manager =
-            unsafe { &mut *(&mut *manager as *mut dyn DeviceManager as *mut KeyboardManager) };
+        let kbd_manager = (&mut *manager as &mut dyn Any)
+            .downcast_mut::<KeyboardManager>()
+            .unwrap();
         kbd_manager.input(key, action);
 
         if key == KeyboardKey::KeyPause && action == KeyboardAction::Pressed {
