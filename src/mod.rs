@@ -443,7 +443,7 @@ impl PS2Keyboard {
         };
 
         let hook_result = event::register_callback(KEYBOARD_INTERRUPT_ID, callback);
-        self.keyboard_interrupt_callback_hook = hook_result.ok();
+        self.keyboard_interrupt_callback_hook = hook_result.ok().flatten();
 
         clear_buffer();
         Ok(())
