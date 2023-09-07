@@ -5,8 +5,6 @@
 #![no_main]
 #![feature(trait_upcasting)]
 
-extern crate kernel;
-
 use core::any::Any;
 use kernel::device::keyboard::Keyboard;
 use kernel::device::keyboard::KeyboardAction;
@@ -19,11 +17,10 @@ use kernel::event::CallbackHook;
 use kernel::event::CallbackResult;
 use kernel::idt;
 use kernel::io;
-use kernel::module::version::Version;
 use kernel::println;
 use kernel::process::regs::Regs;
 
-kernel::module!("ps2", Version::new(1, 0, 0), &[]);
+kernel::module!([]);
 
 /// The interrupt number for keyboard input events.
 const KEYBOARD_INTERRUPT_ID: u32 = 0x21;
