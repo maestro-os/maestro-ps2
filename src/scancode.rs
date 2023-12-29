@@ -1,6 +1,6 @@
 //! Handles scancode sets and keycodes decoding.
 
-use crate::{keyboard_send, read_data, KBD_CMD_SCANCODE, RESP_KEYBOARD_ACK};
+use crate::{keyboard_send, read_data, KBD_CMD_SCANCODE};
 use kernel::device::keyboard::KeyboardAction;
 use kernel::device::keyboard::KeyboardKey;
 
@@ -275,7 +275,6 @@ impl TryFrom<u8> for ScancodeSet {
 
     /// Returns the scancode set corresponding to the given ID.
     fn try_from(n: u8) -> Result<Self, ()> {
-        kernel::println!("A {n:x}");
         match n {
             1 | 0x43 => Ok(Self::Set1),
             2 | 0x41 => Ok(Self::Set2),
@@ -303,11 +302,7 @@ impl ScancodeSet {
         // Get current scancode set
         keyboard_send(KBD_CMD_SCANCODE)?;
         keyboard_send(0)?;
-        // Wait for the next data byte
-        let mut n = read_data();
-        while n == RESP_KEYBOARD_ACK {
-            n = read_data();
-        }
+        let n = read_data();
         // Translate
         Self::try_from(n)
     }
@@ -327,7 +322,6 @@ impl ScancodeSet {
     ///
     /// If no supported set can be used, the function returns an error.
     pub fn fallback(self) -> Result<Self, ()> {
-        kernel::println!("B {self:?}");
         if self.is_supported() {
             return Ok(self);
         }
@@ -335,13 +329,10 @@ impl ScancodeSet {
         loop {
             // Test
             set.set_current()?;
-            kernel::println!("set {set:?}");
             let cur = Self::current()?;
-            kernel::println!("cur {cur:?}");
             if cur == set {
                 return Ok(set);
             }
-            kernel::println!("D");
             // Try next
             set = match set {
                 Self::Set2 => Self::Set1,
