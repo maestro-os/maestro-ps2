@@ -161,13 +161,16 @@ fn enable_keyboard(kbd: &mut PS2Keyboard) -> Result<(), ()> {
     keyboard_send(KBD_CMD_SET_LED)?;
     keyboard_send(0)?;
 
+    // FIXME
     // Get/set keyboard's scancode set
-    ScancodeSet::current()?.fallback()?;
+    /*ScancodeSet::current()?.fallback()?;
     let set = ScancodeSet::current()?;
     if !set.is_supported() {
         println!("Cannot use PS/2: scancode set not supported");
         return Err(());
-    }
+    }*/
+    let set = ScancodeSet::Set2;
+    set.set_current()?;
     kbd.scancode_set = set;
 
     // Set keyboard's typematic byte
