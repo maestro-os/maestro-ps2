@@ -3,7 +3,6 @@
 
 #![no_std]
 #![no_main]
-#![feature(trait_upcasting)]
 
 mod scancode;
 
@@ -22,7 +21,7 @@ use kernel::idt;
 use kernel::io;
 use kernel::println;
 use kernel::process::regs::Regs;
-use kernel::util::lock::Mutex;
+use kernel::utils::lock::Mutex;
 
 kernel::module!([]);
 
