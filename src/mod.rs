@@ -1,6 +1,7 @@
 //! Personal System/2 (PS/2) is a connector designed for keyboards and mouses.
 //! It has now been deprecated in favor of USB keyboards/mouses.
 
+#![feature(trait_upcasting)]
 #![no_std]
 #![no_main]
 
