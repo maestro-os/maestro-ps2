@@ -1,9 +1,9 @@
 //! Personal System/2 (PS/2) is a connector designed for keyboards and mouses.
 //! It has now been deprecated in favor of USB keyboards/mouses.
 
+#![feature(trait_upcasting)]
 #![no_std]
 #![no_main]
-#![feature(trait_upcasting)]
 
 mod scancode;
 
@@ -22,7 +22,7 @@ use kernel::idt;
 use kernel::io;
 use kernel::println;
 use kernel::process::regs::Regs;
-use kernel::util::lock::Mutex;
+use kernel::utils::lock::Mutex;
 
 kernel::module!([]);
 
