@@ -5,6 +5,9 @@
 #![no_std]
 #![no_main]
 
+#[no_link]
+extern crate kernel;
+
 mod scancode;
 
 use crate::scancode::ScancodeSet;
