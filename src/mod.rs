@@ -1,7 +1,6 @@
 //! Personal System/2 (PS/2) is a connector designed for keyboards and mouses.
 //! It has now been deprecated in favor of USB keyboards/mouses.
 
-#![feature(trait_upcasting)]
 #![no_std]
 #![no_main]
 
@@ -302,7 +301,7 @@ fn init_in() -> Result<(), ()> {
 	Ok(())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn init() -> bool {
 	match init_in() {
 		Ok(_) => {
@@ -316,7 +315,7 @@ pub extern "C" fn init() -> bool {
 	}
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn fini() {
 	// Destroy interrupt handler
 	PS2_KEYBOAD.lock().keyboard_interrupt_callback_hook = None;

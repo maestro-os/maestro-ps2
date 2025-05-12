@@ -4,7 +4,7 @@ cargo-features = ["profile-rustflags"]
 name = "ps2"
 version = "0.1.0"
 authors = ["llenotre <llenotre@student.42.fr>"]
-edition = "2021"
+edition = "2024"
 
 [lib]
 path = "src/mod.rs"
